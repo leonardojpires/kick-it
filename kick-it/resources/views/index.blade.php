@@ -8,6 +8,8 @@
             <p>Your one-stop solution for all your needs.</p>
 
             <p> Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nihil architecto sunt recusandae odio doloribus nesciunt eius soluta consequatur laborum non ipsum perferendis ad pariatur voluptas quia nemo debitis, repellendus iure! </p>
+
+            <a href="{{ route('rooms.index') }}" class="btn btn-primary">Go to rooms</a>
         </div>
     </div>
 </div>

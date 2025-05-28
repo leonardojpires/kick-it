@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar_url',
+        'full_score',
+        'level',
+        'is_online',
     ];
 
     /**
@@ -44,5 +48,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function createdRoom() {
+        return $this->hasMany(Room::class, 'creator_id');
+    }
+
+    public function rooms() {
+        return $this->belongsToMany(Room::class);
     }
 }
