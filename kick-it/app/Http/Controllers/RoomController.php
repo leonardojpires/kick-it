@@ -39,6 +39,25 @@ class RoomController extends Controller
         }
 
         return redirect()->back()->with('success', 'Room created successfully!');
+    }
 
+    public function show(Room $room) {
+        return view('rooms.show', compact('room'));
+    }
+
+    public function join(Room $room) {
+        $user = User::findOrFail(1);
+
+        if ($room->players()->count() >= $room->max_users) {
+            return redirect()->back()->with('error', 'Room is full!');
+        }
+
+        if ($room->players()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->with('info', 'You are alreay in this room!');
+        }
+
+        $room->players()->attach($user->id, ['score' => 0]);
+
+        return redirect()->route('rooms.show', $room->id)->with('success', 'You have joined the room!');
     }
 }

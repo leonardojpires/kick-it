@@ -30,8 +30,11 @@
                                     <p class="card-text flex-grow-1 text-truncate" style="max-height: 3.6em;">
                                         {{ $room->description }}
                                     </p>
-                                    <small class="text-muted mb-2">Created by: {{ $user->name }}</small>
-                                    <a href="#" class="btn btn-primary mt-auto">Join</a>
+                                    <small class="text-muted mb-2">Created by: {{ $room->creator->name }}</small>
+                                    <form action="{{ route('rooms.join', $room->id) }}" method="POST">
+                                        @csrf
+                                        <input type="submit" value="Join" class="btn btn-primary">
+                                    </form>
                                 </div>
                             </div>
                         </div>
