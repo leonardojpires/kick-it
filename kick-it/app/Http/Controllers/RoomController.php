@@ -5,19 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
     public function index()
     {
         $rooms = Room::all();
-        $user = User::findOrFail(1);
+        $user = Auth::user();
         return view('main.index', compact('rooms', 'user'));
     }
 
     public function store(Request $request) {
 
-        $user = User::findOrFail(1); // Temporary user ID
+        $user = Auth::user();
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -29,7 +30,7 @@ class RoomController extends Controller
         $room = Room::create([
             'name' => $request->name,
             'description' => $request->description,
-            'creator_id' => User::findOrFail(1)->id, // Temporary user ID
+            'creator_id' => Auth::user()->id,
             'max_users' => $request->max_users,
         ]);
 
@@ -42,11 +43,13 @@ class RoomController extends Controller
     }
 
     public function show(Room $room) {
+
+        $room->load(['creator', 'players', 'words']);
         return view('rooms.show', compact('room'));
     }
 
     public function join(Room $room) {
-        $user = User::findOrFail(1);
+        $user = Auth::user();
 
         if ($room->players()->count() >= $room->max_users) {
             return redirect()->back()->with('error', 'Room is full!');
@@ -59,5 +62,15 @@ class RoomController extends Controller
         $room->players()->attach($user->id, ['score' => 0]);
 
         return redirect()->route('rooms.show', $room->id)->with('success', 'You have joined the room!');
+    }
+
+    public function leave(Room $room) {
+        $user = Auth::user();
+
+        if ($room->players()->where('user_id', $user->id)->exists()) {
+            $room->players()->detach($user->id);
+        }
+
+        return response()->noContent();
     }
 }

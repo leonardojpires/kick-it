@@ -9,7 +9,7 @@
         <div class="card shadow-sm border-0">
           <div class="card-body">
             <h2 class="text-center mb-4">Entrar</h2>
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('auth.authenticate') }}">
               @csrf
 
               <div class="mb-3">

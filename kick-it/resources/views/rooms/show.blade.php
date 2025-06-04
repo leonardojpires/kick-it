@@ -1,14 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <p>Room name: {{ $room->name }}</p>
-    <br>
-    <p>Description: {{ $room->description }}</p>
-</body>
-</html>
+@extends('layouts.fe_master')
+
+@section('content')
+
+<section class="min-vh-100 d-flex flex-column bg-dark text-white p-4">
+
+    <header class="mb-5 text-center">
+        <h1 class="display-3 fw-bold text-warning">{{ $room->name }} 🎲</h1>
+        <p class="lead fst-italic">{{ $room->description }}</p>
+        <p class="text-white">Created By: <span class="fw-bold text-info">{{ $room->creator->name }}</span></p>
+    </header>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center gap-4">
+
+        <div class="card bg-gradient bg-secondary shadow-lg border-warning w-75">
+            <div class="card-header text-center bg-warning text-dark fw-bold fs-5">
+                👥 Players in the Room
+            </div>
+            <ul class="list-group list-group-flush">
+                @forelse ($room->players as $player)
+                    <li class="list-group-item bg-dark text-white text-center">
+                        🎮 {{ $player->name }}
+                    </li>
+                @empty
+                    <li class="list-group-item bg-dark text-white text-center">
+                        🚶‍♂️ There's no one here yet...
+                    </li>
+                @endforelse
+            </ul>
+        </div>
+
+        <div class="alert alert-info text-center w-75 fs-5 shadow-sm" role="alert">
+            ⏳ Waiting for the game to start... <br> Get ready for a lot of fun! 🎉🎮✨
+        </div>
+
+    </main>
+
+</section>
+
+<script>
+    window.addEventListener('beforeunload', function (e) {
+        navigator.sendBeacon("{{ route('rooms.leave', $room->id) }}", new URLSearchParams({
+            _token: "{{ csrf_token() }}"
+        }));
+    });
+</script>
+
+@endsection
