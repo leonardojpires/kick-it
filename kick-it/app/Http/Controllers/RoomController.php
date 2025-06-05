@@ -45,6 +45,13 @@ class RoomController extends Controller
     public function show(Room $room) {
 
         $room->load(['creator', 'players', 'words']);
+
+        $user = Auth::user();
+
+        if (!$room->players->contains($user->id)) {
+            return redirect()->route('rooms.index');
+        }
+
         return view('rooms.show', compact('room'));
     }
 
