@@ -9,18 +9,20 @@
             <p>Type the words as fast as you can to win!</p>
         </div>
         <div class="card-body">
-            <div class="mb-4 text-center" id="wordUnderscores">
-                @foreach ($room->words as $word)
-                    <span class="badge bg-secondary fs-5 mx-1">
-                        {{ str_repeat(' _ ', strlen($word->word)) }}
-                    </span>
+            <form id="gameForm">
+                @foreach ($room->words as $index => $word)
+                    <div class="mb-4">
+                        <div class="fs-4 text-center mb-1">
+                            <span class="badge bg-secondary fs-5 mb-1">
+                                {{ str_repeat(' _ ', strlen($word->word)) }}
+                            </span>
+                        </div>
+                        <input type="text" name="guess_{{ $index }}" class="form-control mb-2" placeholder="Type your guess..." autocomplete="off" data-word="{{ strtolower($word->word) }}">
+                        <button type="button" class="btn btn-primary validate-btn" data-index="{{ $index }}">Guess</button>
+                        <div class="mt-2" id="feedback_{{ $index }}"></div>
+                    </div>
                 @endforeach
-            </div>
-
-            <div class="mb-3">
-                <label for="wordInput" class="form-label">Enter your guess:</label>
-                <input type="text" class="form-control" id="wordInput" placeholder="Type a word..." autocomplete="off">
-            </div>
+            </form>
 
             <div id="guessedWords" class="mt-4">
                 <h5>✅ Guessed Words:</h5>
@@ -37,22 +39,31 @@
 </div>
 
 <script>
-    const wordInput = document.getElementById('wordInput');
-    const guessedWordsList = document.getElementById('guessedWordsList');
-    const guessedWords = [];
+    document.querySelectorAll('.validate-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const index = button.getAttribute('data-index');
+            const input = document.querySelector(`input[name="guess_${index}"]`);
+            const feedback = document.getElementById(`feedback_${index}`);
+            const guess = input.value.trim().toLowerCase();
+            const correctWord = input.getAttribute('data-word');
 
-    wordInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            const word = wordInput.value.trim().toLowerCase();
-            if (word && !guessedWords.includes(word)) {
-                // This is where you'd send it to the server for validation
-                guessedWords.push(word);
-                guessedWordsList.innerHTML += `
-                    <li class="list-group-item bg-dark text-success">${word}</li>
-                `;
-                wordInput.value = '';
+            if (guess === '') {
+                feedback.textContent = 'Please enter a guess!';
+                feedback.style.color = 'orange';
+                return;
             }
-        }
-    });
+
+            if (guess === correctWord ) {
+                feedback.textContent = '✅ Correct!';
+                feedback.style.color = 'green';
+                input.disabled = true;
+                button.disabled = true;
+            }
+            else {
+                feedback.textContent = '❌ Wrong, try again!';
+                feedback.style.color = 'red';
+            }
+        })
+    })
 </script>
 @endsection
