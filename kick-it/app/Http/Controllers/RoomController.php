@@ -106,7 +106,7 @@ class RoomController extends Controller
 
     public function start(Room $room) {
 
-        $room->load('players');
+        $room->load('players', 'words');
 
         if (!$room->players->contains('id', Auth::id())) {
             return redirect()->route('rooms.index');

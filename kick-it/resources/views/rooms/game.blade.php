@@ -9,6 +9,14 @@
             <p>Type the words as fast as you can to win!</p>
         </div>
         <div class="card-body">
+            <div class="mb-4 text-center" id="wordUnderscores">
+                @foreach ($room->words as $word)
+                    <span class="badge bg-secondary fs-5 mx-1">
+                        {{ str_repeat(' _ ', strlen($word->word)) }}
+                    </span>
+                @endforeach
+            </div>
+
             <div class="mb-3">
                 <label for="wordInput" class="form-label">Enter your guess:</label>
                 <input type="text" class="form-control" id="wordInput" placeholder="Type a word..." autocomplete="off">
