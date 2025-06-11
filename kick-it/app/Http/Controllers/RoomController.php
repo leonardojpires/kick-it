@@ -48,7 +48,13 @@ class RoomController extends Controller
 
         $user = Auth::user();
 
-        if (!$room->players->contains($user->id)) {
+        /* AJAX */
+        if (request()->ajax()) {
+            $players = $room->players->filter(fn ($player) => $player->id !== $room->creator_id)->values();
+            return response()->json($players);
+        }
+
+        if (!$room->players->contains('id', $user->id)) {
             return redirect()->route('rooms.index');
         }
 
@@ -63,7 +69,7 @@ class RoomController extends Controller
         }
 
         if ($room->players()->where('user_id', $user->id)->exists()) {
-            return redirect()->back()->with('info', 'You are alreay in this room!');
+            return redirect()->back()->with('info', 'You are already in this room!');
         }
 
         $room->players()->attach($user->id, ['score' => 0]);
@@ -80,4 +86,45 @@ class RoomController extends Controller
 
         return response()->noContent();
     }
+
+    public function delete(Room $room) {
+        $room->delete();
+        return redirect()->back();
+    }
+
+    public function startGame(Room $room) {
+
+        if (Auth::id() !== $room->creator_id) {
+            abort(403, 'Only the room creator can start the game!');
+        }
+
+        $room->is_started = true;
+        $room->save();
+
+        return view('rooms.game', ['room' => $room]);
+    }
+
+    public function start(Room $room) {
+
+        $room->load('players');
+
+        if (!$room->players->contains('id', Auth::id())) {
+            return redirect()->route('rooms.index');
+        }
+
+        return view('rooms.game', compact('room'));
+    }
+
+    public function status(Room $room) {
+        $user = Auth::user();
+
+        if (!$room->players->contains('id', $user->id)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'is_started' => $room->is_started,
+        ]);
+    }
+
 }

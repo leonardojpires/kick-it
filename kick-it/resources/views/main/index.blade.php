@@ -35,10 +35,21 @@
                                             {{ $room->description }}
                                         </p>
                                         <small class="text-muted mb-2">Created by: {{ $room->creator->name }}</small>
-                                        <form action="{{ route('rooms.join', $room->id) }}" method="POST">
-                                            @csrf
-                                            <input type="submit" value="Join" class="btn btn-primary">
-                                        </form>
+                                        <div class="d-flex justify-content-start gap-2">
+
+                                            <form action="{{ route('rooms.join', $room->id) }}" method="POST">
+                                                @csrf
+                                                <input type="submit" value="Join" class="btn btn-primary">
+                                            </form>
+
+                                            @if (Auth::user()->id == $room->creator_id)
+                                            <form action="{{ route('rooms.delete', $room->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <input type="submit" value="Delete" class="btn btn-danger">
+                                            </form>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>

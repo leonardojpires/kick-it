@@ -15,11 +15,19 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
 
+    Route::get('/rooms/{room}/start', [RoomController::class, 'start'])->name('rooms.start');
+
+    Route::get('/rooms/{room}/status', [RoomController::class, 'status'])->name('rooms.status');
+
+    Route::post('/rooms/{room}/startGame', [RoomController::class, 'startGame'])->name('rooms.startGame');
+
     Route::post('/create-room', [RoomController::class, 'store'])->name('rooms.store');
 
     Route::post('/rooms/{room}/join', [RoomController::class, 'join'])->name('rooms.join');
 
-    Route::post('rooms/{room}/leave', [RoomController::class, 'leave'])->name('rooms.leave');
+    Route::post('/rooms/{room}/leave', [RoomController::class, 'leave'])->name('rooms.leave');
+
+    Route::delete('/rooms/{room}/delete', [RoomController::class, 'delete'])->name('rooms.delete');
 });
 
 # AuthController Routes

@@ -1,61 +1,121 @@
-@extends('layouts.fe_master')
 
-@section('content')
+    @extends('layouts.fe_master')
 
-<section class="min-vh-100 d-flex flex-column bg-dark text-white p-4">
+    @section('content')
 
-    <header class="mb-2 text-center">
-        <h1 class="display-3 fw-bold text-warning">{{ $room->name }} 🎲</h1>
-        <p class="lead fst-italic">{{ $room->description }}</p>
-        <p class="text-white">Created By: <span class="fw-bold text-info">{{ $room->creator->name }}</span></p>
-    </header>
+    <section class="min-vh-100 d-flex flex-column bg-dark text-white p-4">
 
-    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center gap-4">
+        <header class="mb-2 text-center">
+            <h1 class="display-3 fw-bold text-warning">{{ $room->name }} 🎲</h1>
+            <p class="lead fst-italic">{{ $room->description }}</p>
+            <p class="text-white">Created By: <span class="fw-bold text-info">{{ $room->creator->name }}</span></p>
+        </header>
 
-        <div class="mb-5">
-            @if (Auth::user()->id === $room->creator->id)
-                <form action="">
-                    <button class="btn btn-success">Start Game</button>
-                </form>
-            @endif
-        </div>
+        <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center gap-4">
 
-        <div class="card bg-gradient bg-secondary shadow-lg border-warning w-75">
-            <div class="card-header text-center bg-warning text-dark fw-bold fs-5">
-                👥 Players in the Room
+            <div class="mb-5">
+                @if (Auth::user()->id === $room->creator->id)
+                    <form action="{{ route('rooms.startGame', $room->id) }}" method="POST">
+                        @csrf
+                        <button class="btn btn-success">Start Game</button>
+                    </form>
+                @endif
             </div>
-            <ul class="list-group list-group-flush">
-                @forelse ($room->players->where('id', '!=', $room->creator->id) as $player)
-                    <li class="list-group-item bg-dark text-white text-center">
-                        🎮 {{ $player->name }}
-                    </li>
-                @empty
-                    <li class="list-group-item bg-dark text-white text-center">
-                        🚶‍♂️ There's no one here yet...
-                    </li>
-                @endforelse
-            </ul>
-        </div>
 
-        <div class="alert alert-info text-center w-75 fs-5 shadow-sm" role="alert">
-            ⏳ Waiting for the game to start... <br> Get ready for a lot of fun! 🎉🎮✨
-        </div>
+            <div class="card bg-gradient bg-secondary shadow-lg border-warning w-75">
+                <div class="card-header text-center bg-warning text-dark fw-bold fs-5">
+                    👥 Players in the Room
+                </div>
+                <ul class="list-group list-group-flush">
+                    @forelse ($room->players->where('id', '!=', $room->creator->id) as $player)
+                        <li class="list-group-item bg-dark text-white text-center">
+                            🎮 {{ $player->name }}
+                        </li>
+                    @empty
+                        <li class="list-group-item bg-dark text-white text-center">
+                            🚶‍♂️ There's no one here yet...
+                        </li>
+                    @endforelse
+                </ul>
+            </div>
 
-    </main>
+            <div class="alert alert-info text-center w-75 fs-5 shadow-sm" role="alert">
+                ⏳ Waiting for the game to start... <br> Get ready for a lot of fun! 🎉🎮✨
+            </div>
 
-</section>
+        </main>
 
-<script>
-    window.addEventListener('beforeunload', function (e) {
+    </section>
 
-        const isCreator = {{ Auth::id() === $room->creator->id ? 'true' : 'false' }}
+    <script>
+        window.addEventListener('beforeunload', function (e) {
 
-        if (!isCreator) {
-            navigator.sendBeacon("{{ route('rooms.leave', $room->id) }}", new URLSearchParams({
-                _token: "{{ csrf_token() }}"
-            }));
+            const isCreator = {{ Auth::id() === $room->creator->id ? 'true' : 'false' }}
+
+            if (!isCreator) {
+                navigator.sendBeacon("{{ route('rooms.leave', $room->id) }}", new URLSearchParams({
+                    _token: "{{ csrf_token() }}"
+                }));
+            }
+
+        });
+
+        const playerList = document.querySelector('.list-group');
+
+        function updatePlayerList() {
+            fetch("{{ route('rooms.show', $room->id) }}", {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(players => {
+                playerList.innerHTML = '';
+
+                if (players.length === 0) {
+                    playerList.innerHTML = `
+                        <li class="list-group-item bg-dark text-white text-center">
+                            🚶‍♂️ There's no one here yet...
+                        </li>
+                    `;
+                } else {
+                    players.forEach(player => {
+                        playerList.innerHTML += `
+                            <li class="list-group-item bg-dark text-white text-center">
+                                🎮 ${player.name}
+                            </li>
+                        `;
+                    });
+                }
+            })
+            .catch(error => console.error('Erro ao buscar jogadores:', error));
         }
-    });
-</script>
 
-@endsection
+        setInterval(updatePlayerList, 3000);
+        updatePlayerList();
+
+        function checkGameStarted() {
+            fetch("{{ route('rooms.status', $room->id) }}", {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Unauthorized');
+                }
+                return response.json();
+            }).then(data => {
+                if (data.is_started) {
+                    window.location.href = "{{ route('rooms.start', $room->id) }}"
+                }
+            }).catch(error => {
+                console.error(`Error verifying game status ${error}`);
+            });
+        }
+
+        setInterval(checkGameStarted, 2000);
+        checkGameStarted();
+
+    </script>
+
+    @endsection
