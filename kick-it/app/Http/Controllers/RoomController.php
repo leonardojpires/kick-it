@@ -109,19 +109,22 @@ class RoomController extends Controller
 
     public function start(Room $room) {
 
-        $room->load('players', 'words');
         $user = Auth::user();
 
-/*         if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
+        $isPlayer = $room->players()->where('user_id', $user->id)->exists();
+
+        if (!($isPlayer || $room->creator_id === $user->id)) {
             return redirect()->route('rooms.index');
-        } */
+        }
+
+        $room->load('players', 'words');
 
         return view('rooms.game', compact('room'));
     }
 
     public function status(Room $room) {
         $user = Auth::user();
-        $room->load('players');
+        $room->load('players', 'words');
 
         if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
             return response()->json(['error' => 'Unauthorized'], 403);
