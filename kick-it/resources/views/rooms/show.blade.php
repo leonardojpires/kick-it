@@ -17,7 +17,7 @@
                 @if (Auth::user()->id === $room->creator->id)
                     <form action="{{ route('rooms.startGame', $room->id) }}" method="POST">
                         @csrf
-                        <button class="btn btn-success">Start Game</button>
+                        <button class="btn btn-success" id="startGameButton">Start Game</button>
                     </form>
                 @endif
             </div>
@@ -73,6 +73,7 @@
                 playerList.innerHTML = '';
 
                 if (players.length === 0) {
+
                     playerList.innerHTML = `
                         <li class="list-group-item bg-dark text-white text-center">
                             🚶‍♂️ There's no one here yet...
@@ -87,6 +88,13 @@
                         `;
                     });
                 }
+
+                if (!(players.length >= 2)) {
+                    document.getElementById('startGameButton').disabled = true;
+                } else {
+                    document.getElementById('startGameButton').disabled = false;
+                }
+
             })
             .catch(error => console.error('Erro ao buscar jogadores:', error));
         }
@@ -113,7 +121,7 @@
             });
         }
 
-        setInterval(checkGameStarted, 2000);
+        setInterval(checkGameStarted, 3000);
         checkGameStarted();
 
     </script>

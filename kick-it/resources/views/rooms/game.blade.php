@@ -14,7 +14,7 @@
                     <div class="mb-4">
                         <div class="fs-4 text-center mb-1">
                             <span class="badge bg-secondary fs-5 mb-1">
-                                {{ str_repeat(' _ ', strlen($word->word)) }}
+                                {{ str_repeat(' _ ', strlen($word->word)) }} <span>{{ "(" . strlen($word->word) . ")" }}</span>
                             </span>
                         </div>
                         <input type="text" name="guess_{{ $index }}" class="form-control mb-2" placeholder="Type your guess..." autocomplete="off" data-word="{{ strtolower($word->word) }}">
@@ -27,7 +27,7 @@
             <div id="guessedWords" class="mt-4">
                 <h5>✅ Guessed Words:</h5>
                 <ul class="list-group list-group-flush bg-dark" id="guessedWordsList">
-                    <!-- Guessed words will be inserted here -->
+
                 </ul>
             </div>
 
@@ -46,6 +46,7 @@
             const feedback = document.getElementById(`feedback_${index}`);
             const guess = input.value.trim().toLowerCase();
             const correctWord = input.getAttribute('data-word');
+            const wordsGuessedList = document.getElementById('guessedWordsList');
 
             if (guess === '') {
                 feedback.textContent = 'Please enter a guess!';
@@ -58,12 +59,18 @@
                 feedback.style.color = 'green';
                 input.disabled = true;
                 button.disabled = true;
+
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item', 'bg-dark', 'text-white');
+                wordsGuessedList.appendChild(listItem);
+                listItem.textContent = correctWord;
+
             }
             else {
                 feedback.textContent = '❌ Wrong, try again!';
                 feedback.style.color = 'red';
             }
-        })
-    })
+        });
+    });
 </script>
 @endsection

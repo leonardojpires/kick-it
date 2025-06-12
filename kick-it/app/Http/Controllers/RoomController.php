@@ -34,18 +34,19 @@ class RoomController extends Controller
             'max_users' => $request->max_users,
         ]);
 
+        $room->players()->attach($user->id, ['score' => 0]);
+
         $words = explode(',', $request->words);
         foreach ($words as $word) {
             $room->words()->create(['word' => trim($word)]);
         }
 
-        return redirect()->back()->with('success', 'Room created successfully!');
+        return redirect()->route('rooms.show', $room);
     }
 
     public function show(Room $room) {
 
         $room->load(['creator', 'players', 'words']);
-
         $user = Auth::user();
 
         /* AJAX */
@@ -54,7 +55,7 @@ class RoomController extends Controller
             return response()->json($players);
         }
 
-        if (!$room->players->contains('id', $user->id)) {
+        if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
             return redirect()->route('rooms.index');
         }
 
@@ -64,15 +65,17 @@ class RoomController extends Controller
     public function join(Room $room) {
         $user = Auth::user();
 
-        if ($room->players()->count() >= $room->max_users) {
-            return redirect()->back()->with('error', 'Room is full!');
-        }
-
         if ($room->players()->where('user_id', $user->id)->exists()) {
             return redirect()->back()->with('info', 'You are already in this room!');
         }
 
+        if ($room->players()->count() >= $room->max_users) {
+            return redirect()->back()->with('error', 'Room is full!');
+        }
+
         $room->players()->attach($user->id, ['score' => 0]);
+
+       \Log::debug('User joined room', ['user_id' => $user->id, 'room_id' => $room->id]);
 
         return redirect()->route('rooms.show', $room->id)->with('success', 'You have joined the room!');
     }
@@ -107,18 +110,20 @@ class RoomController extends Controller
     public function start(Room $room) {
 
         $room->load('players', 'words');
+        $user = Auth::user();
 
-        if (!$room->players->contains('id', Auth::id())) {
+/*         if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
             return redirect()->route('rooms.index');
-        }
+        } */
 
         return view('rooms.game', compact('room'));
     }
 
     public function status(Room $room) {
         $user = Auth::user();
+        $room->load('players');
 
-        if (!$room->players->contains('id', $user->id)) {
+        if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
