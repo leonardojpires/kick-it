@@ -62,8 +62,8 @@
 
                 const listItem = document.createElement('li');
                 listItem.classList.add('list-group-item', 'bg-dark', 'text-white');
+                listItem.innerHTML = `<span>${correctWord}</span>`;
                 wordsGuessedList.appendChild(listItem);
-                listItem.textContent = correctWord;
 
             }
             else {

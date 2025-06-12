@@ -48,6 +48,7 @@
     </section>
 
     <script>
+        // If the user reloads or leaves the page, remove them from the room
         window.addEventListener('beforeunload', function (e) {
 
             const isCreator = {{ Auth::id() === $room->creator->id ? 'true' : 'false' }}
@@ -59,6 +60,8 @@
             }
 
         });
+
+        /* ----------------------------- */
 
         const playerList = document.querySelector('.list-group');
 
@@ -102,6 +105,13 @@
         setInterval(updatePlayerList, 3000);
         updatePlayerList();
 
+        /* ----------------------------- */
+
+        // Sets an interval to check if the game has started
+        let gameStatusInterval = setInterval(checkGameStarted, 3000);
+        checkGameStarted();
+
+        // AJAX
         function checkGameStarted() {
             fetch("{{ route('rooms.status', $room->id) }}", {
                 headers: {
@@ -114,15 +124,16 @@
                 return response.json();
             }).then(data => {
                 if (data.is_started) {
+                    // Stops the interval when game starts. This prevents further excessive resource usage
+                    clearInterval(gameStatusInterval);
+
+                    // Redirects the users to the game
                     window.location.href = "{{ route('rooms.start', $room->id) }}"
                 }
             }).catch(error => {
                 console.error(`Error verifying game status ${error}`);
             });
         }
-
-        setInterval(checkGameStarted, 3000);
-        checkGameStarted();
 
     </script>
 

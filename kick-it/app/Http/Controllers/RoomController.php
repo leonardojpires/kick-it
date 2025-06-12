@@ -75,7 +75,8 @@ class RoomController extends Controller
 
         $room->players()->attach($user->id, ['score' => 0]);
 
-       \Log::debug('User joined room', ['user_id' => $user->id, 'room_id' => $room->id]);
+        /* DEBBUGING */
+       // \Log::debug('User joined room', ['user_id' => $user->id, 'room_id' => $room->id]);
 
         return redirect()->route('rooms.show', $room->id)->with('success', 'You have joined the room!');
     }
@@ -104,7 +105,7 @@ class RoomController extends Controller
         $room->is_started = true;
         $room->save();
 
-        return view('rooms.game', ['room' => $room]);
+        return redirect()->route('rooms.start', $room->id);
     }
 
     public function start(Room $room) {
