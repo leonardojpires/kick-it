@@ -27,6 +27,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/rooms/{room}/leave', [RoomController::class, 'leave'])->name('rooms.leave');
 
+    Route::post('/rooms/{room}/win', [RoomController::class, 'win'])->name('rooms.win');
+
     Route::delete('/rooms/{room}/delete', [RoomController::class, 'delete'])->name('rooms.delete');
 });
 

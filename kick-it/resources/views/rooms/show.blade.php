@@ -51,9 +51,9 @@
         // If the user reloads or leaves the page, remove them from the room
         window.addEventListener('beforeunload', function (e) {
 
-            const isCreator = {{ Auth::id() === $room->creator->id ? 'true' : 'false' }}
+            const isCreator = {{ Auth::id() === $room->creator->id ? 'true' : 'false' }};
 
-            if (!isCreator) {
+            if (!isCreator && !gameStarted) {
                 navigator.sendBeacon("{{ route('rooms.leave', $room->id) }}", new URLSearchParams({
                     _token: "{{ csrf_token() }}"
                 }));
@@ -64,6 +64,7 @@
         /* ----------------------------- */
 
         const playerList = document.querySelector('.list-group');
+        const startGameButton = document.getElementById('startGameButton');
 
         function updatePlayerList() {
             fetch("{{ route('rooms.show', $room->id) }}", {
@@ -92,10 +93,13 @@
                     });
                 }
 
-                if (!(players.length >= 2)) {
-                    document.getElementById('startGameButton').disabled = true;
-                } else {
-                    document.getElementById('startGameButton').disabled = false;
+
+                if (startGameButton) {
+                    if (!(players.length >= 2)) {
+                        document.getElementById('startGameButton').disabled = true;
+                    } else {
+                        document.getElementById('startGameButton').disabled = false;
+                    }
                 }
 
             })
@@ -124,11 +128,13 @@
                 return response.json();
             }).then(data => {
                 if (data.is_started) {
+                    gameStarted = true;
+                    console.log("Status do jogo:", data.is_started);
                     // Stops the interval when game starts. This prevents further excessive resource usage
                     clearInterval(gameStatusInterval);
 
                     // Redirects the users to the game
-                    window.location.href = "{{ route('rooms.start', $room->id) }}"
+                    window.location.href = {!! json_encode(route('rooms.start', $room->id)) !!} ;
                 }
             }).catch(error => {
                 console.error(`Error verifying game status ${error}`);

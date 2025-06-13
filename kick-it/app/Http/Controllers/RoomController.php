@@ -112,6 +112,8 @@ class RoomController extends Controller
 
         $user = Auth::user();
 
+        $room->load('players');
+
         $isPlayer = $room->players()->where('user_id', $user->id)->exists();
 
         if (!($isPlayer || $room->creator_id === $user->id)) {
@@ -134,6 +136,29 @@ class RoomController extends Controller
         return response()->json([
             'is_started' => $room->is_started,
         ]);
+    }
+
+    public function win(Room $room) {
+        $user = Auth::user();
+        $room->load('players', 'words');
+
+        if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($room->winner_id !== null) {
+            return response()->json(['error' => 'Game already finished!'], 403);
+        }
+
+        $room->winner_id = $user->id;
+        $room->is_started = false;
+        $room->save();
+
+        $room->players()->updateExistingPivot($user->id, [
+            'score' => \DB::raw('score + 1')
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
 }
