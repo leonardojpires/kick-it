@@ -24,4 +24,8 @@ class Room extends Model
     public function players() {
         return $this->belongsToMany(User::class, 'room_user')->withPivot('score')->withTimeStamps();
     }
+
+    public function winner() {
+        return $this->belongsTo(User::class, 'winner_id');
+    }
 }

@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="mt-4 text-end">
-                    <button class="btn btn-secondary" disabled>Waiting for someone to win...</button>
+                    <button class="btn btn-secondary" id="statusButton" disabled>Waiting for someone to win...</button>
                 </div>
             </div>
         </div>
@@ -70,18 +70,51 @@
 
     <script>
         let guessedCount = 0;
+        let hasLost = false;
+
         const totalWords = {{ count($room->words) }};
-        const roomWinnerId = {{ $room->winner_id ?? null }};
-        const currentUserId = {{ Auth::user()->id }};
+        const roomWinnerId = {!! json_encode($room->winner_id) !!};
+        const currentUserId = {!! json_encode(Auth::user()->id) !!};
+
+
 
         document.addEventListener('DOMContentLoaded', () => {
+            /* If the room has a winner and it's not the current user */
             if (roomWinnerId && roomWinnerId !== currentUserId) {
                 document.querySelectorAll('.validate-btn').forEach(btn => btn.disabled = true);
                 document.querySelectorAll('input[type=text]').forEach(input => input.disabled = true);
-
-                const loserModal = new bootstrap.Modal(document.getElementById('loserModal'));
-                loserModal.show();
             }
+
+            setInterval(() => {
+                /* If the user has already lost or if all the words have been guessed, stop the interval */
+                if (hasLost || guessedCount === totalWords) return;
+                const statusButton = document.getElementById('statusButton');
+
+
+                fetch("{{ route('rooms.status', $room->id) }}")
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.winner_id && data.winner_id !== currentUserId) {
+                            hasLost = true;
+
+                            if (data.winner_name) {
+                                statusButton.textContent = `🏆 ${data.winner_name} has won!`
+                            } else {
+                                statusButton.textContent = '🏆 Someone has one!'
+                            }
+
+                            document.querySelectorAll('.validate-btn').forEach(btn => btn.disabled = true);
+                            document.querySelectorAll('input[type=text]').forEach(input => input.disabled = true);
+
+                            const loserModal = new bootstrap.Modal(document.getElementById('loserModal'));
+                            loserModal.show();
+
+                            setTimeout(() => {
+                                window.location.href = "{{ route('rooms.index') }}"
+                            }, 5000);
+                        }
+                    })
+            }, 3000)
 
 
             document.querySelectorAll('.validate-btn').forEach(button => {
@@ -123,10 +156,14 @@
                                 }).then(res => res.json())
                                 .then(data => {
                                     if (data.success) {
-                                        const winnerModal = new bootstrap.Modal(document
-                                            .getElementById(
-                                                'winnerModal'));
+                                        const winnerModal = new bootstrap.Modal(document.getElementById('winnerModal'));
                                         winnerModal.show();
+
+                                    if (data.winner_name) {
+                                        statusButton.textContent = `🏆 ${data.winner_name} has won!`
+                                    } else {
+                                        statusButton.textContent = '🏆 Someone has one!'
+                                    }
 
                                         setTimeout(() => {
                                             window.location.href =
@@ -135,8 +172,6 @@
                                     }
                                 })
                         }
-
-
                     } else {
                         feedback.textContent = '❌ Wrong, try again!';
                         feedback.style.color = 'red';

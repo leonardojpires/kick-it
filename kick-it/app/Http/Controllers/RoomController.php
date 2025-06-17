@@ -127,7 +127,7 @@ class RoomController extends Controller
 
     public function status(Room $room) {
         $user = Auth::user();
-        $room->load('players', 'words');
+        $room->load('players', 'words', 'winner');
 
         if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -135,12 +135,14 @@ class RoomController extends Controller
 
         return response()->json([
             'is_started' => $room->is_started,
+            'winner_id' => $room->winner_id,
+            'winner_name' => optional($room->winner)->name,
         ]);
     }
 
     public function win(Room $room) {
         $user = Auth::user();
-        $room->load('players', 'words');
+        $room->load('players', 'words', 'winner');
 
         if (!($room->players->contains('id', $user->id) || $room->creator_id === $user->id)) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -158,7 +160,7 @@ class RoomController extends Controller
             'score' => \DB::raw('score + 1')
         ]);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'winner_name' => $user->name]);
     }
 
 }
