@@ -31,6 +31,8 @@
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body d-flex flex-column">
                                         <h5 class="card-title">{{ $room->name }}</h5>
+                                        <p class="card-text text-muted mb-2">
+                                            <strong>Players:</strong> {{ $room->playersWithoutCreator->count() }}/{{ $room->max_users }}
                                         <p class="card-text flex-grow-1 text-truncate" style="max-height: 3.6em;">
                                             {{ $room->description }}
                                         </p>

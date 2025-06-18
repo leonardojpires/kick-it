@@ -11,8 +11,14 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $rooms = Room::all();
+        $rooms = Room::with(['players', 'creator'])->get();
+
+        $rooms->each(function ($room) {
+            $room->playersWithoutCreator = $room->players->where('id', '!=', $room->creator_id);
+        });
+
         $user = Auth::user();
+
         return view('main.index', compact('rooms', 'user'));
     }
 
