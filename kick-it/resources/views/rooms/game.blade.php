@@ -123,7 +123,6 @@
                             document.querySelectorAll('.validate-btn').forEach(btn => btn.disabled = true);
                             document.querySelectorAll('input[type=text]').forEach(input => input.disabled = true);
 
-
                             if (currentUserId !== creatorId) {
                                 const loserModal = new bootstrap.Modal(document.getElementById('loserModal'));
                                 loserModal.show();

@@ -13,6 +13,12 @@ class Room extends Model
         'max_users'
     ];
 
+    protected $appends = ['playersWithoutCreator'];
+
+    public function getPlayersWithoutCreatorAttribute() {
+        return $this->players->count() - 1;
+    }
+
     public function creator() {
         return $this->belongsTo(User::class, 'creator_id');
     }

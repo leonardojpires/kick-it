@@ -9,17 +9,19 @@ use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::with(['players', 'creator'])->get();
+        $rooms = Room::with('creator')->get();
 
-        $rooms->each(function ($room) {
-            $room->playersWithoutCreator = $room->players->where('id', '!=', $room->creator_id);
-        });
+        if ($request->ajax()) {
+            return response()->json([
+                'rooms' => $rooms,
+            ]);
+        }
 
         $user = Auth::user();
 
-        return view('main.index', compact('rooms', 'user'));
+        return view('main.index', compact('rooms'));
     }
 
     public function store(Request $request) {
