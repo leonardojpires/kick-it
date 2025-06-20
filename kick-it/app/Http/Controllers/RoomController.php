@@ -168,6 +168,9 @@ class RoomController extends Controller
             'score' => \DB::raw('score + 1')
         ]);
 
+        $user->full_score += 1;
+        $user->save();
+
         return response()->json(['success' => true, 'winner_name' => $user->name]);
     }
 

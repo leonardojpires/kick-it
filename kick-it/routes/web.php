@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/rooms/{room}/win', [RoomController::class, 'win'])->name('rooms.win');
 
     Route::delete('/rooms/{room}/delete', [RoomController::class, 'delete'])->name('rooms.delete');
+
+    Route::get('/profile/{user}', [UserController::class, 'show'])->name('profile.show');
 });
 
 # AuthController Routes

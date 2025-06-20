@@ -30,9 +30,11 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{{ route('rooms.index') }}">Room</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Your Profile</a>
-                        </li>
+                        @if (Auth::check() && Auth::user())
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('profile.show', Auth::user()->id) }}">Your Profile</a>
+                            </li>
+                        @endif
                     </ul>
                     @if (Auth::check() && Auth::user())
                         <form action="{{ route('auth.logout') }}" method="POST">

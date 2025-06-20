@@ -7,12 +7,12 @@
                 <div class="col-12 col-sm-10 col-md-6 col-lg-4">
                     <div class="card shadow-sm border-0">
                         <div class="card-body">
-                            <h2 class="text-center mb-4">Criar Conta</h2>
+                            <h2 class="text-center mb-4">Create Account</h2>
                             <form method="POST" action="{{ route('auth.store') }}">
                                 @csrf
 
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Nome</label>
+                                    <label for="name" class="form-label">Name</label>
                                     <input type="text" class="form-control" id="name" name="name" required
                                         autofocus>
                                 </div>
@@ -24,25 +24,25 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
+                                    <label for="email" class="form-label">E-Mail</label>
                                     <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Palavra-passe</label>
+                                    <label for="password" class="form-label">Password</label>
                                     <input type="password" class="form-control" id="password" name="password" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="password_confirmation" class="form-label">Confirmar Palavra-passe</label>
+                                    <label for="password_confirmation" class="form-label">Confirm Password</label>
                                     <input type="password" class="form-control" id="password_confirmation"
                                         name="password_confirmation" required>
                                 </div>
 
-                                <button type="submit" class="btn btn-success w-100">Registar</button>
+                                <button type="submit" class="btn btn-success w-100">Sign Up</button>
 
                                 <div class="text-center mt-3">
-                                    <a href="{{ route('login') }}" class="small">Já tens conta? Entra aqui</a>
+                                    <a href="{{ route('login') }}" class="small">Do you already have an account? Sign in here.</a>
                                 </div>
                             </form>
                         </div>

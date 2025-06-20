@@ -8,12 +8,12 @@
       <div class="col-12 col-sm-10 col-md-6 col-lg-4">
         <div class="card shadow-sm border-0">
           <div class="card-body">
-            <h2 class="text-center mb-4">Entrar</h2>
+            <h2 class="text-center mb-4">Log In</h2>
             <form method="POST" action="{{ route('auth.authenticate') }}">
               @csrf
 
               <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+                <label for="email" class="form-label">E-Mail</label>
                 <input
                   type="email"
                   class="form-control"
@@ -25,7 +25,7 @@
               </div>
 
               <div class="mb-3">
-                <label for="password" class="form-label">Palavra-passe</label>
+                <label for="password" class="form-label">Password</label>
                 <input
                   type="password"
                   class="form-control"
@@ -42,13 +42,12 @@
                   id="remember"
                   name="remember"
                 >
-                <label class="form-check-label" for="remember">Lembrar-me</label>
               </div>
 
-              <button type="submit" class="btn btn-primary w-100">Entrar</button>
+              <button type="submit" class="btn btn-primary w-100">Sign In</button>
 
               <div class="text-center mt-3">
-                <a href="{{ route('password.request') }}" class="small">Esqueceste a senha?</a>
+                <a href="{{ route('register') }}" class="small">Sign Up</a>
               </div>
             </form>
           </div>
