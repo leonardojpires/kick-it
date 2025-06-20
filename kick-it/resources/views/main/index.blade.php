@@ -15,7 +15,7 @@
         @endif
 
         <header class="p-3 bg-primary text-white text-center">
-            <h1 class="h4 mb-0">Salas Disponíveis</h1>
+            <h1 class="h4 mb-0">Available Rooms</h1>
         </header>
 
         <main class="flex-grow-1 overflow-auto p-3">
